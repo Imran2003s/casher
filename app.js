@@ -358,7 +358,7 @@ async function addProduct() {
   document.getElementById('pStock').value = '';
 }
 
-// ===== إحصاءات لوحة التحكم (مع حساب صافي الربح الشهري) =====
+// ===== إحصاءات لوحة التحكم =====
 async function loadDashboardStats() {
   online = navigator.onLine;
   let products = [];
@@ -494,9 +494,7 @@ async function loadDashboardStats() {
     topList.innerHTML = '<p style="color:#dc2626; text-align:center;">حدث خطأ في تحميل البيانات</p>';
   }
 
-  // ======================================================
-  // حساب صافي الربح الشهري
-  // ======================================================
+  // ===== حساب صافي الربح الشهري =====
   try {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
@@ -1483,6 +1481,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+  // ===== تسجيل Service Worker للعمل بدون إنترنت =====
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js')
+        .then(function(registration) {
+          console.log('✅ Service Worker مسجل بنجاح:', registration);
+        })
+        .catch(function(error) {
+          console.log('❌ فشل تسجيل Service Worker:', error);
+        });
+    });
+  }
+
   (async function checkSession() {
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (session) {
@@ -1502,17 +1513,3 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   })();
 });
-
-
-// ===== تسجيل Service Worker للعمل بدون إنترنت =====
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/sw.js')
-      .then(function(registration) {
-        console.log('✅ Service Worker مسجل بنجاح:', registration);
-      })
-      .catch(function(error) {
-        console.log('❌ فشل تسجيل Service Worker:', error);
-      });
-  });
-}
