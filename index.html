@@ -5,14 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>نظام قرطاسية - POS</title>
   
-  <!-- ===== أيقونة خاصة بنظام POS (🛒) ===== -->
+  <!-- ===== أيقونة POS من الإنترنت ===== -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛒</text></svg>" />
+  <link rel="icon" type="image/png" sizes="32x32" href="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" />
   
-  <!-- ===== أيقونة بديلة (PNG) لضمان الظهور في جميع المتصفحات ===== -->
-  <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARzQklUCAgICHwIZAAAAUtJREFUWEftl7FtwzAQRV9KIMgE9hBOB3E3UAdzA3UDZQOng1gbOAPEG8QbqBukG9gbqAu4GyhTqANUJnyHmzpHJCgIhSzAA0hL1LvHp+VTqKVjE2P8I9wBPQEne8FSSuHHTUDwEGI8Zyzbnj1A6AHoQH+CEgBLSJmFngLqLqX0kwAuwTEDVJQQBiJ6KiABDgslgbV1g1KqFgH+mk0wVlIBvPVonbswNhhKSX1SAlVJABhSSqf2QJjX2jtJAEGeQXoPjCnARQIwtyTgwQC4ZAAKpzVkRUC5BgCkgMUQKCuPGN/bA88ieeXzBkCRrY+EL5/vBHiIAOED8qOMSSm9SfWCPTyafHCMd8hSJcCq7t+eBbL/k7+HAtjvjwkMkGYPKMFwMC6sMQAE2Y8P6m5NlJ47+Jw3p7MLU8Z8A/Y9uLkD8/c5/wE9YJ5ciz+tcQAAAABJRU5ErkJggg==" />
-  
+  <!-- ===== الخطوط والأيقونات ===== -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  
+  <!-- ===== ربط الـ PWA ===== -->
   <link rel="manifest" href="manifest.json" />
   
   <style>
@@ -600,7 +602,7 @@
       </div>
     </section>
 
-    <!-- ===== التقارير (مع الربح والنسبة) ===== -->
+    <!-- ===== التقارير ===== -->
     <section id="section-reports" class="page-section">
       <h2 style="margin-bottom: 15px;">📊 تقارير المبيعات</h2>
       <div class="report-controls">
@@ -694,6 +696,7 @@
   </div>
 </div>
 
+<!-- ===== المكتبات ===== -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/dexie@3.2.4/dist/dexie.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
