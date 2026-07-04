@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>نظام قرطاسية - POS</title>
+  
+  <!-- ===== أيقونة خاصة بنظام POS (🛒) ===== -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛒</text></svg>" />
+  
+  <!-- ===== أيقونة بديلة (PNG) لضمان الظهور في جميع المتصفحات ===== -->
+  <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARzQklUCAgICHwIZAAAAUtJREFUWEftl7FtwzAQRV9KIMgE9hBOB3E3UAdzA3UDZQOng1gbOAPEG8QbqBukG9gbqAu4GyhTqANUJnyHmzpHJCgIhSzAA0hL1LvHp+VTqKVjE2P8I9wBPQEne8FSSuHHTUDwEGI8Zyzbnj1A6AHoQH+CEgBLSJmFngLqLqX0kwAuwTEDVJQQBiJ6KiABDgslgbV1g1KqFgH+mk0wVlIBvPVonbswNhhKSX1SAlVJABhSSqf2QJjX2jtJAEGeQXoPjCnARQIwtyTgwQC4ZAAKpzVkRUC5BgCkgMUQKCuPGN/bA88ieeXzBkCRrY+EL5/vBHiIAOED8qOMSSm9SfWCPTyafHCMd8hSJcCq7t+eBbL/k7+HAtjvjwkMkGYPKMFwMC6sMQAE2Y8P6m5NlJ47+Jw3p7MLU8Z8A/Y9uLkD8/c5/wE9YJ5ciz+tcQAAAABJRU5ErkJggg==" />
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="manifest" href="manifest.json" />
+  
+  <style>
+    /* ===== جميع الستايلات المتكاملة ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Tajawal', 'Segoe UI', sans-serif;
+      background: #f0f4f9;
+      color: #1e293b;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #loginPage {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100%;
+      background: linear-gradient(135deg, #0f172a 0%, #4f46e5 100%);
+      position: fixed;
+      top: 0;
+      z-index: 999;
+    }
+    .login-card {
+      background: white;
+      padding: 45px 40px;
+      border-radius: 32px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .login-card .icon-circle {
+      width: 80px; height: 80px;
+      background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 36px; color: white;
+      box-shadow: 0 10px 30px rgba(79, 70, 229, 0.3);
+    }
+    .login-card h1 { font-size: 26px; font-weight: 800; color: #0f172a; }
+    .login-card p { color: #64748b; margin-bottom: 25px; }
+    .login-card .input-group {
+      position: relative; margin-bottom: 18px; text-align: right;
+    }
+    .login-card .input-group i {
+      position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+      color: #94a3b8; font-size: 18px;
+    }
+    .login-card .input-group input {
+      width: 100%; padding: 14px 50px 14px 16px;
+      border: 2px solid #e2e8f0; border-radius: 14px;
+      font-size: 16px; background: #f8fafc;
+      transition: 0.3s; font-family: 'Tajawal', sans-serif;
+    }
+    .login-card .input-group input:focus {
+      border-color: #4f46e5; outline: none;
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    }
+    .login-card button {
+      width: 100%; padding: 16px;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white; border: none; border-radius: 14px;
+      font-size: 18px; font-weight: 700; cursor: pointer;
+      transition: 0.3s; font-family: 'Tajawal', sans-serif;
+    }
+    .login-card button:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(79, 70, 229, 0.4); }
+    #loginMessage { margin-top: 15px; font-size: 14px; font-weight: 500; min-height: 24px; }
+
+    #mainApp {
+      display: none;
+      width: 100%;
+      height: 100vh;
+      background: #f0f4f9;
+      position: relative;
+    }
+    .menu-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 30px;
+      text-align: center;
+    }
+    .menu-container h2 { font-size: 32px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+    .menu-container p { color: #64748b; font-size: 18px; margin-bottom: 45px; }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 30px;
+      max-width: 1000px;
+      width: 100%;
+    }
+    @media (max-width: 800px) {
+      .menu-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    }
+    @media (max-width: 450px) {
+      .menu-grid { grid-template-columns: 1fr; }
+    }
+    .menu-card {
+      background: white;
+      padding: 35px 20px;
+      border-radius: 28px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      border: 1px solid #f1f5f9;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .menu-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 5px;
+      transition: 0.3s;
+    }
+    .menu-card:nth-child(1)::after { background: #4f46e5; }
+    .menu-card:nth-child(2)::after { background: #10b981; }
+    .menu-card:nth-child(3)::after { background: #f59e0b; }
+    .menu-card:nth-child(4)::after { background: #ec4899; }
+    .menu-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
+      border-color: transparent;
+    }
+    .menu-card i { font-size: 48px; margin-bottom: 15px; display: block; }
+    .menu-card:nth-child(1) i { color: #4f46e5; }
+    .menu-card:nth-child(2) i { color: #10b981; }
+    .menu-card:nth-child(3) i { color: #f59e0b; }
+    .menu-card:nth-child(4) i { color: #ec4899; }
+    .menu-card h3 { font-size: 22px; font-weight: 700; color: #0f172a; }
+    .menu-card span { font-size: 14px; color: #94a3b8; }
+
+    #pageContainer {
+      display: none;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 30px 35px;
+      background: #f0f4f9;
+    }
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 30px;
+      background: white;
+      padding: 15px 25px;
+      border-radius: 18px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+    .page-header .back-btn {
+      background: #f1f5f9;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 15px;
+      color: #1e293b;
+      cursor: pointer;
+      transition: 0.3s;
+      font-family: 'Tajawal', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .page-header .back-btn:hover { background: #e2e8f0; }
+    .page-header h2 { font-size: 24px; font-weight: 800; color: #0f172a; }
+
+    #connectionStatus {
+      margin-right: auto;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 30px;
+      background: #f1f5f9;
+    }
+    #connectionStatus i { font-size: 16px; }
+
+    .logout-btn {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-family: 'Tajawal', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logout-btn:hover { background: #dc2626; transform: scale(1.03); }
+
+    .card {
+      background: white;
+      border-radius: 24px;
+      padding: 25px 30px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+      border: 1px solid #f1f5f9;
+      margin-bottom: 25px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .card-header h3 { font-size: 18px; font-weight: 700; color: #0f172a; }
+    .card-header h3 i { color: #4f46e5; margin-left: 10px; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      background: white; padding: 22px 25px; border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+      border: 1px solid #f1f5f9;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .stat-card .info h4 { font-size: 14px; color: #94a3b8; font-weight: 600; }
+    .stat-card .info .number { font-size: 28px; font-weight: 800; color: #0f172a; }
+    .stat-card .icon-bg { width: 50px; height: 50px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .bg-purple { background: #eef2ff; color: #4f46e5; }
+    .bg-green { background: #dcfce7; color: #16a34a; }
+    .bg-orange { background: #ffedd5; color: #ea580c; }
+    .bg-red { background: #fee2e2; color: #dc2626; }
+    .bg-pink { background: #fce7f3; color: #db2777; }
+    .bg-gold { background: #fef9c3; color: #ca8a04; }
+
+    .form-row { display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end; }
+    .form-row .field { flex: 1; min-width: 140px; }
+    .form-row .field label { display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 5px; }
+    .form-row .field input {
+      width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 14px;
+      font-size: 15px; background: #f8fafc; transition: 0.3s; font-family: 'Tajawal', sans-serif;
+    }
+    .form-row .field input:focus { border-color: #4f46e5; outline: none; box-shadow: 0 0 0 4px rgba(79,70,229,0.08); }
+
+    .btn-primary { background: #4f46e5; color: white; border: none; padding: 12px 30px; border-radius: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; font-family: 'Tajawal', sans-serif; }
+    .btn-primary:hover { background: #4338ca; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(79,70,229,0.3); }
+    .btn-success { background: #10b981; }
+    .btn-success:hover { background: #059669; box-shadow: 0 8px 25px rgba(16,185,129,0.3); }
+    .btn-danger { background: #ef4444; }
+    .btn-danger:hover { background: #dc2626; box-shadow: 0 8px 25px rgba(239,68,68,0.3); }
+    .btn-warning { background: #f59e0b; }
+    .btn-warning:hover { background: #d97706; box-shadow: 0 8px 25px rgba(245,158,11,0.3); }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: right; padding: 12px 10px; background: #f8fafc; color: #475569; font-weight: 700; font-size: 14px; }
+    td { padding: 12px 10px; border-bottom: 1px solid #f1f5f9; }
+    .badge { background: #eef2ff; color: #4f46e5; padding: 4px 12px; border-radius: 30px; font-size: 13px; font-weight: 700; }
+    .badge-danger { background: #fee2e2; color: #dc2626; }
+    .badge-success { background: #dcfce7; color: #16a34a; }
+
+    .pos-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 25px; }
+    @media (max-width: 900px) { .pos-grid { grid-template-columns: 1fr; } }
+    .pos-cart .cart-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+    .pos-cart .total-row { font-size: 24px; font-weight: 800; padding-top: 15px; margin-top: 10px; border-top: 3px solid #4f46e5; }
+
+    .msg-box { padding: 12px 16px; border-radius: 14px; margin-top: 12px; font-weight: 500; }
+    .msg-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .msg-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+    .msg-warning { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+
+    .page-section { display: none; animation: fadeIn 0.3s ease; }
+    .page-section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .hidden { display: none !important; }
+
+    .insight-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+      margin-top: 10px;
+    }
+    @media (max-width: 800px) {
+      .insight-grid { grid-template-columns: 1fr; }
+    }
+    .insight-card {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+      border: 1px solid #f1f5f9;
+    }
+    .insight-card h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .insight-card h4 i { color: #4f46e5; }
+    .insight-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 14px;
+    }
+    .insight-item:last-child { border-bottom: none; }
+    .insight-item .rank { font-weight: 700; color: #94a3b8; margin-left: 10px; }
+    .insight-item .name { flex: 1; }
+    .insight-item .value { font-weight: 700; color: #0f172a; }
+
+    .qty-btn {
+      background: #e2e8f0;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .qty-btn:hover { background: #cbd5e1; }
+
+    #editModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    #editModal .modal-content {
+      background: white;
+      padding: 35px;
+      border-radius: 24px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+      animation: slideDown 0.3s ease;
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    #editModal h3 { margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: #0f172a; }
+    #editModal h3 i { color: #4f46e5; }
+    #editModal .field-group { margin-bottom: 15px; }
+    #editModal .field-group label { display: block; font-weight: 600; color: #475569; margin-bottom: 5px; }
+    #editModal .field-group input {
+      width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px;
+      font-size: 15px; font-family: 'Tajawal', sans-serif;
+    }
+    #editModal .field-group input:focus {
+      border-color: #4f46e5; outline: none; box-shadow: 0 0 0 4px rgba(79,70,229,0.08);
+    }
+    #editModal .btn-row { display: flex; gap: 10px; margin-top: 20px; }
+    #editModal .btn-row button { flex: 1; }
+    #editModal .btn-cancel {
+      padding: 12px; background: #e2e8f0; border: none; border-radius: 12px;
+      font-weight: 700; cursor: pointer; transition: 0.3s;
+    }
+    #editModal .btn-cancel:hover { background: #cbd5e1; }
+    #editMsg { margin-top: 15px; font-weight: 600; }
+
+    .report-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 25px;
+      align-items: flex-end;
+    }
+    .report-controls .field { flex: 1; min-width: 150px; }
+    .report-controls .field label {
+      display: block; font-weight: 600; font-size: 13px;
+      color: #475569; margin-bottom: 5px;
+    }
+    .report-controls .field input,
+    .report-controls .field select {
+      width: 100%; padding: 10px 14px; border: 2px solid #e2e8f0;
+      border-radius: 12px; font-size: 14px; background: #f8fafc;
+      font-family: 'Tajawal', sans-serif;
+    }
+    .report-controls .field input:focus,
+    .report-controls .field select:focus {
+      border-color: #4f46e5; outline: none; box-shadow: 0 0 0 4px rgba(79,70,229,0.08);
+    }
+    .report-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .report-table th {
+      background: #f1f5f9; padding: 12px 10px; text-align: center;
+      font-weight: 700; color: #334155;
+    }
+    .report-table td { padding: 10px; text-align: center; border-bottom: 1px solid #f1f5f9; }
+    .report-table tr:hover td { background: #f8fafc; }
+    .total-row { background: #eef2ff; font-weight: 700; }
+    .total-row td { color: #4f46e5; }
+    .report-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    .report-summary .stat-box {
+      background: white; padding: 15px 20px; border-radius: 16px;
+      border: 1px solid #f1f5f9; text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .report-summary .stat-box .label { font-size: 13px; color: #94a3b8; }
+    .report-summary .stat-box .value {
+      font-size: 22px; font-weight: 800; color: #0f172a; margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== صفحة تسجيل الدخول ===== -->
+<div id="loginPage">
+  <div class="login-card">
+    <div class="icon-circle"><i class="fas fa-store"></i></div>
+    <h1>نظام القرطاسية</h1>
+    <p>سجل دخولك لإدارة المتجر السحابي</p>
+    <div class="input-group">
+      <i class="fas fa-envelope"></i>
+      <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" />
+    </div>
+    <div class="input-group">
+      <i class="fas fa-lock"></i>
+      <input type="password" id="loginPassword" placeholder="كلمة المرور" />
+    </div>
+    <button id="loginFormBtn"><i class="fas fa-arrow-left"></i> تسجيل الدخول</button>
+    <div id="loginMessage"></div>
+  </div>
+</div>
+
+<!-- ===== التطبيق الرئيسي ===== -->
+<div id="mainApp">
+
+  <div id="mainMenu" class="menu-container">
+    <h2>🏪 لوحة التحكم الرئيسية</h2>
+    <p>اختر القسم الذي تريد العمل عليه</p>
+    <div class="menu-grid">
+      <div class="menu-card" data-section="dashboard">
+        <i class="fas fa-chart-pie"></i>
+        <h3>لوحة التحكم</h3>
+        <span>إحصائيات وتقارير</span>
+      </div>
+      <div class="menu-card" data-section="inventory">
+        <i class="fas fa-boxes"></i>
+        <h3>المخزون</h3>
+        <span>إدارة المنتجات</span>
+      </div>
+      <div class="menu-card" data-section="pos">
+        <i class="fas fa-cash-register"></i>
+        <h3>البيع</h3>
+        <span>نقطة البيع (كاشير)</span>
+      </div>
+      <div class="menu-card" data-section="reports">
+        <i class="fas fa-chart-line"></i>
+        <h3>التقارير</h3>
+        <span>عرض وتحليل المبيعات</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="pageContainer">
+    <div class="page-header">
+      <button class="back-btn" id="backToMenuBtn"><i class="fas fa-arrow-right"></i> العودة للرئيسية</button>
+      <h2 id="pageTitle">لوحة التحكم</h2>
+      <span id="connectionStatus"><i class="fas fa-wifi" style="color:#10b981;"></i> متصل</span>
+      <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> خروج</button>
+    </div>
+
+    <!-- ===== لوحة التحكم ===== -->
+    <section id="section-dashboard" class="page-section active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="info"><h4>إجمالي المنتجات</h4><div class="number" id="totalProducts">0</div></div>
+          <div class="icon-bg bg-purple"><i class="fas fa-cube"></i></div>
+        </div>
+        <div class="stat-card">
+          <div class="info"><h4>مبيعات اليوم</h4><div class="number" id="todaySales">0.00</div></div>
+          <div class="icon-bg bg-green"><i class="fas fa-coins"></i></div>
+        </div>
+        <div class="stat-card">
+          <div class="info"><h4>منتجات منخفضة المخزون</h4><div class="number" id="lowStockCount">0</div></div>
+          <div class="icon-bg bg-red"><i class="fas fa-exclamation-triangle"></i></div>
+        </div>
+        <div class="stat-card">
+          <div class="info"><h4>صافي الربح الشهري</h4><div class="number" id="monthlyProfit">0.00</div></div>
+          <div class="icon-bg bg-gold"><i class="fas fa-chart-line"></i></div>
+        </div>
+      </div>
+      <div class="insight-grid">
+        <div class="insight-card">
+          <h4><i class="fas fa-fire"></i> أكثر المنتجات مبيعاً</h4>
+          <div id="topProductsList"><p style="color:#94a3b8; text-align:center;">لا توجد مبيعات بعد</p></div>
+        </div>
+        <div class="insight-card">
+          <h4><i class="fas fa-exclamation-circle"></i> المنتجات التي ستنفذ</h4>
+          <div id="lowStockList"><p style="color:#94a3b8; text-align:center;">جميع المنتجات متوفرة</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== المخزون ===== -->
+    <section id="section-inventory" class="page-section">
+      <div class="card">
+        <div class="card-header"><h3><i class="fas fa-plus-circle"></i> إضافة منتج جديد</h3></div>
+        <div class="form-row">
+          <div class="field"><label>اسم المنتج</label><input type="text" id="pName" placeholder="مثل: قلم رصاص" /></div>
+          <div class="field"><label>الباركود</label><input type="text" id="pBarcode" placeholder="رقم الباركود" /></div>
+          <div class="field"><label>سعر الشراء</label><input type="number" id="pPurchasePrice" placeholder="0.00" step="0.01" /></div>
+          <div class="field"><label>سعر البيع</label><input type="number" id="pPrice" placeholder="0.00" step="0.01" /></div>
+          <div class="field"><label>الكمية</label><input type="number" id="pStock" placeholder="0" /></div>
+          <div class="field" style="min-width:120px;"><button class="btn-primary" id="addProductBtn"><i class="fas fa-save"></i> حفظ</button></div>
+        </div>
+        <div id="productMsg"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3><i class="fas fa-list"></i> قائمة المنتجات</h3></div>
+        <div class="table-responsive" style="overflow-x:auto;">
+          <table>
+            <thead><tr><th>#</th><th>الاسم</th><th>الباركود</th><th>سعر الشراء</th><th>سعر البيع</th><th>المخزون</th><th style="text-align:center;">العمليات</th></tr></thead>
+            <tbody id="productTableBody"><tr><td colspan="7" style="text-align:center;color:#94a3b8;">لا توجد منتجات بعد</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== البيع ===== -->
+    <section id="section-pos" class="page-section">
+      <div class="pos-grid">
+        <div>
+          <div class="card">
+            <div class="card-header"><h3><i class="fas fa-barcode"></i> إضافة للفاتورة</h3></div>
+            <div class="form-row" style="flex-direction:column; gap:15px;">
+              <div style="display:flex; gap:10px; width:100%;">
+                <div class="field" style="flex:1;"><label>مسح الباركود</label><input type="text" id="barcodeScanner" placeholder="امسح أو اكتب الباركود" style="width:100%;" /></div>
+                <div class="field" style="flex:1;"><label>أو بحث بالاسم</label><input type="text" id="productNameSearch" placeholder="اكتب اسم المنتج" style="width:100%;" /></div>
+              </div>
+              <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                <button class="btn-success" id="addToInvoiceBtn"><i class="fas fa-cart-plus"></i> إضافة للفاتورة</button>
+                <button class="btn-primary" id="completeSaleBtn"><i class="fas fa-check-circle"></i> إتمام البيع</button>
+                <button class="btn-danger" id="clearCartBtn"><i class="fas fa-trash"></i> تفريغ</button>
+                
+                <div style="display:flex; align-items:center; gap:10px; margin-right:10px; flex-wrap:wrap;">
+                  <label style="display:flex; align-items:center; gap:6px; font-weight:600; cursor:pointer; background:#f1f5f9; padding:8px 16px; border-radius:30px;">
+                    <input type="checkbox" id="printCheckbox" style="width:18px; height:18px; cursor:pointer;" />
+                    <i class="fas fa-print"></i> طباعة الفاتورة
+                  </label>
+                  <span style="color:#94a3b8; font-size:13px;">(غير مفعل)</span>
+                  
+                  <label style="display:flex; align-items:center; gap:6px; font-weight:600; cursor:pointer; background:#f1f5f9; padding:8px 16px; border-radius:30px; font-size:13px;">
+                    <input type="checkbox" id="autoPrintCheckbox" style="width:18px; height:18px; cursor:pointer; accent-color:#4f46e5;" />
+                    <i class="fas fa-sync-alt"></i> طباعة تلقائية
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div id="posMsg" style="margin-top:15px;"></div>
+          </div>
+        </div>
+        <div>
+          <div class="card pos-cart">
+            <div class="card-header"><h3><i class="fas fa-shopping-cart"></i> الفاتورة الحالية</h3></div>
+            <div id="cartItems"><p style="color:#94a3b8;">الفاتورة فارغة</p></div>
+            <div class="total-row">الإجمالي: <span id="cartTotal">0.00</span> <span style="font-size:14px;color:#94a3b8;font-weight:400;">د.ع</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== التقارير (مع الربح والنسبة) ===== -->
+    <section id="section-reports" class="page-section">
+      <h2 style="margin-bottom: 15px;">📊 تقارير المبيعات</h2>
+      <div class="report-controls">
+        <div class="field" style="flex: 0 0 auto;">
+          <label>عرض</label>
+          <select id="reportType" style="min-width: 140px;">
+            <option value="today">اليوم</option>
+            <option value="month">شهر محدد</option>
+            <option value="last12">آخر 12 شهراً</option>
+          </select>
+        </div>
+        <div class="field" id="dateField">
+          <label>التاريخ</label>
+          <input type="date" id="reportDate" />
+        </div>
+        <div class="field" id="monthField" style="display: none;">
+          <label>الشهر</label>
+          <input type="month" id="reportMonth" />
+        </div>
+        <button class="btn-primary" id="loadReportBtn"><i class="fas fa-search"></i> عرض</button>
+        <button class="btn-success" id="exportReportBtn" style="background: #10b981;"><i class="fas fa-file-export"></i> تصدير</button>
+      </div>
+
+      <div class="report-summary" id="reportSummary">
+        <div class="stat-box"><div class="label">عدد الفواتير</div><div class="value" id="reportInvoiceCount">0</div></div>
+        <div class="stat-box"><div class="label">إجمالي المبيعات</div><div class="value" id="reportTotalSales">0.00</div></div>
+        <div class="stat-box"><div class="label">متوسط قيمة الفاتورة</div><div class="value" id="reportAverage">0.00</div></div>
+        <div class="stat-box">
+          <div class="label">إجمالي الربح</div>
+          <div class="value" id="reportTotalProfit" style="color:#16a34a;">0.00</div>
+        </div>
+        <div class="stat-box">
+          <div class="label">نسبة الربح</div>
+          <div class="value" id="reportProfitPercentage" style="color:#16a34a;">0.00%</div>
+        </div>
+      </div>
+
+      <div style="background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); border: 1px solid #f1f5f9;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <h4 style="font-size: 16px; font-weight: 700; color: #0f172a;"><i class="fas fa-calendar-day" style="color: #4f46e5;"></i> المبيعات اليومية</h4>
+          <span id="reportRange" style="font-size: 14px; color: #94a3b8;">اليوم: </span>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="report-table" id="reportTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>رقم الفاتورة</th>
+                <th>التاريخ</th>
+                <th>عدد المنتجات</th>
+                <th>الإجمالي (د.ع)</th>
+                <th>الربح (د.ع)</th>
+              </tr>
+            </thead>
+            <tbody id="reportTableBody">
+              <tr><td colspan="6" style="text-align:center; color:#94a3b8;">لا توجد بيانات لعرضها</td></tr>
+            </tbody>
+            <tfoot id="reportTableFoot" style="display: none;">
+              <tr class="total-row">
+                <td colspan="3" style="text-align: left;">الإجمالي الكلي</td>
+                <td id="footerTotalItems">0</td>
+                <td id="footerTotalSales">0.00</td>
+                <td id="footerTotalProfit">0.00</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- ===== نافذة التعديل ===== -->
+<div id="editModal">
+  <div class="modal-content">
+    <h3><i class="fas fa-edit"></i> تعديل المنتج</h3>
+    <input type="hidden" id="editProductId" />
+    <div class="field-group"><label>اسم المنتج</label><input type="text" id="editName" /></div>
+    <div class="field-group"><label>الباركود</label><input type="text" id="editBarcode" /></div>
+    <div style="display:flex; gap:15px;">
+      <div class="field-group" style="flex:1;"><label>سعر الشراء</label><input type="number" id="editPurchasePrice" step="0.01" /></div>
+      <div class="field-group" style="flex:1;"><label>سعر البيع</label><input type="number" id="editPrice" step="0.01" /></div>
+    </div>
+    <div class="field-group"><label>المخزون</label><input type="number" id="editStock" /></div>
+    <div class="btn-row">
+      <button class="btn-primary" id="saveEditBtn"><i class="fas fa-save"></i> حفظ التعديلات</button>
+      <button class="btn-cancel" id="closeEditModalBtn">إلغاء</button>
+    </div>
+    <div id="editMsg"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/dexie@3.2.4/dist/dexie.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
